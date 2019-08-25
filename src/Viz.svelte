@@ -7,7 +7,6 @@
 	let tokenMetadata = {};
 	$: {
 		for (var i = 0; i < Object.keys(tokenInfo.default).length; i++) {
-			console.log("Object.keys(tokenInfo)[i].toLowerCase()", Object.keys(tokenInfo.default)[i].toLowerCase());
 			tokenMetadata[Object.keys(tokenInfo.default)[i].toLowerCase()] = tokenInfo.default[Object.keys(tokenInfo.default)[i]];
 		}
 	}
@@ -92,6 +91,27 @@
 		}
 		return metadata;
 	}
+
+	function getContract(addi) {
+		return fetch("https://api.etherscan.io/api?module=contract&action=getabi&address=" + addi + "&tag=latest&apikey=41S5QUA8PX2459R568N1GABSBEX14RVQT7", {
+			method: 'GET',
+			mode: 'cors', // no-cors, cors, *same-origin
+		})
+		.then(res => res.json())
+		.then((out) => {
+			console.log("getContract", out);
+			console.log("getContract.status", out.status);
+			console.log("status == 1", out.status == 1);
+			if(out.status == 1) {
+				return true;	
+			}
+			else {
+				return false;
+			}
+		})
+		.catch(err => { return false; })
+	}
+
 </script>
 
 <style>
@@ -123,7 +143,18 @@
 	<g transform='translate(50,50)'>
 		{#each nodes as node, index}
 			<path d="M 0 0 L {node.x} {node.y}" stroke-width="{node.value > 0 ? widthFactor * node.value : 0.2}" fill="red" />
-			<circle cx={node.x} cy={node.y} r="5" fill="purple" on:click={() => addr.set(node.id)} />
+			<!-- Is token -->
+			{#if node.symbol}
+				<circle cx={node.x} cy={node.y} r="5" fill="green" on:click={() => addr.set(node.id)} />
+			{:else}
+				{#await getContract(node.id) then result}
+					{#if result}
+						<circle cx={node.x} cy={node.y} r="5" fill="blue" on:click={() => addr.set(node.id)} />
+					{:else}
+						<circle cx={node.x} cy={node.y} r="5" fill="purple" on:click={() => addr.set(node.id)} />
+					{/if}
+				{/await}
+			{/if}
 			<a href="https://etherscan.io/address/{node.id}" target="_blank">
 				<!-- {#if node.img}
 					<image x="{node.x}" y="{node.y + 1}" width="32" height="32" href="https://github.com/MetaMask/eth-contract-metadata/blob/master/images/{node.img}?raw=true" />

@@ -106,7 +106,7 @@
 
 	function summarizeKyber(trades) {
 		const daiTrades = trades.filter(d => d.src == "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359");
-		let daiSum = (daiTrades.reduce((a, c) => a + parseInt(c["actualSrcAmount"]), 0) / 100000000).toFixed(2);
+		let daiSum = (daiTrades.reduce((a, c) => a + parseInt(c["actualSrcAmount"]), 0) / 1000000000000000000).toFixed(2);
 		const dgxTrades = trades.filter(d => d.src == "0x4f3afec4e5a3f2a6a1a411def7d7dfe50ee057bf");
 		let dgxSum = (dgxTrades.reduce((a, c) => a + parseInt(c["actualSrcAmount"]), 0) / 1000000000).toFixed(2);
 
@@ -122,13 +122,13 @@
 
 	function getKudoDescription(addi) {
 		console.log("tokenURI", addi);
-		fetch(addi, {
+		return fetch(addi, {
 			method: 'GET',
-			mode: 'no-cors', // no-cors, cors, *same-origin
+			mode: 'cors', // no-cors, cors, *same-origin
+			headers: new Headers({'content-type': 'application/json'}),
 		})
 		.then(res => res.json())
 		.then((out) => {
-			console.log("out", out);
 			return out.description;
 		})
 		.catch(err => { throw err })
@@ -161,12 +161,6 @@
 	}
 
 	export let name = "whatev";
-	
-	//---------------------------------------
-
-
-
-	//---------------------------------------
 	
 </script>
 
@@ -319,12 +313,14 @@
 				<p>Loading...</p>
 			{:then result}
 				{#if result.data.kudos.length > 0}
-					<p>🖧 holds {result.data.kudos.length} Kudos from Gitcoin.</p>
-					<!-- <li>
+					<p>🖧 holds {result.data.kudos.length} Kudos from Gitcoin:</p>
+					<ul>
 					{#each result.data.kudos as kudo, index}
-						<ul>{getKudoDescription(kudo.tokenURI)}</ul>
+						{#await getKudoDescription(kudo.tokenURI) then result}
+							<li>"{result}"</li>
+						{/await}
 					{/each}
-					</li> -->
+					</ul>
 				{/if}
 			{:catch error}
 				<p>ERROR: {error}</p>
@@ -334,3 +330,5 @@
 	</div>
 
 {/if}
+
+<hr />
