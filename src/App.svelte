@@ -172,11 +172,13 @@
 
 <h1>PrivETHy</h1>
 
-<input type="text" bind:value={$addr}>
+<input type="text" bind:value={$addr} placeholder="Enter ETH address">
 
 {#if $addr}
 
-	<Viz data={$data} />
+	{#if $data != ""}
+		<Viz data={$data} />
+	{/if}
 
 	<h3>This account...</h3>
 
