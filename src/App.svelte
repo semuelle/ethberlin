@@ -175,11 +175,11 @@
 <input type="text" bind:value={$addr} placeholder="Enter ETH address">
 
 {#if $addr}
-
+<!-- 
 	{#if $data != ""}
 		<Viz data={$data} />
 	{/if}
-
+ -->
 	<h3>This account...</h3>
 
 	<div style="margin-left: 5%">
